@@ -1,10 +1,14 @@
 import { useState } from 'react'
+import { format, parseISO } from 'date-fns'
+import { CalendarIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
 import { createTask } from '@/lib/api'
 import type { Task } from '@/types'
 
@@ -20,7 +24,8 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
   const [priority, setPriority] = useState('medium')
   const [status, setStatus] = useState('todo')
   const [loading, setLoading] = useState(false)
-  const [dueDate, setDueDate] = useState('')
+  const [dueDate, setDueDate] = useState<Date | undefined>(undefined)
+  const [calOpen, setCalOpen] = useState(false)
 
   async function handleSubmit() {
     if (!title.trim()) return
@@ -31,7 +36,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
         description: description || undefined,
         priority: priority as Task['priority'],
         status: status as Task['status'],
-        due_date: dueDate || undefined,
+        due_date: dueDate ? format(dueDate, 'yyyy-MM-dd') : undefined,
       })
       onCreated(task)
       onClose()
@@ -39,7 +44,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
       setDescription('')
       setPriority('medium')
       setStatus('todo')
-      setDueDate('')
+      setDueDate(undefined)
       toast.success(task.due_date ? `Task created · due ${task.due_date}` : 'Task created')
     } catch {
       toast.error('Failed to create task')
@@ -101,13 +106,26 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           </div>
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Due Date</label>
-            <input
-              type="text"
-              placeholder="YYYY-MM-DD — e.g. 2026-05-01"
-              value={dueDate}
-              onChange={e => setDueDate(e.target.value)}
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring placeholder:text-muted-foreground/50"
-            />
+            <Popover open={calOpen} onOpenChange={setCalOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-8 justify-start text-sm font-normal"
+                >
+                  <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
+                  {dueDate ? format(dueDate, 'MMM d, yyyy') : <span className="text-muted-foreground">Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={d => { setDueDate(d); setCalOpen(false) }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 
