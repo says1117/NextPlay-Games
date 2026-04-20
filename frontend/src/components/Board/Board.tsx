@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
+import { flushSync } from 'react-dom'
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd'
 import { toast } from 'sonner'
 import { Column } from './Column'
@@ -60,12 +61,14 @@ export function Board() {
 
     const newStatus = destination.droppableId as TaskStatus
 
-    setTasks(prev => prev.map(t =>
-      t.id === draggableId ? { ...t, status: newStatus } : t
-    ))
-    setSelectedTask(prev =>
-      prev?.id === draggableId ? { ...prev, status: newStatus } : prev
-    )
+    flushSync(() => {
+      setTasks(prev => prev.map(t =>
+        t.id === draggableId ? { ...t, status: newStatus } : t
+      ))
+      setSelectedTask(prev =>
+        prev?.id === draggableId ? { ...prev, status: newStatus } : prev
+      )
+    })
 
     try {
       await updateTask(draggableId, { status: newStatus })
