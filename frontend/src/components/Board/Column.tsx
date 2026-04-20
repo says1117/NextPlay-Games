@@ -91,7 +91,7 @@ export const Column = memo(function Column({ status, label, tasks, onTaskClick }
   const config = columnConfig[status]
 
   return (
-    <div className="flex flex-col w-[85vw] sm:w-[380px] shrink-0 snap-center sm:snap-align-none">
+    <div className="flex flex-col w-[85vw] sm:w-[calc(25vw-24px)] sm:min-w-[220px] sm:max-w-[300px] shrink-0 snap-center sm:snap-align-none">
       {/* Column header */}
       <div className="flex items-center gap-2.5 mb-3 px-1">
         <span className={`h-3 w-3 rounded-full shrink-0 ${config.dot}`} />
