@@ -41,40 +41,48 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
   }
 
   return (
-    <div className="border-b border-border bg-background px-6 py-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="border-b border-border bg-background px-4 sm:px-6 py-4">
+      {/* Top row: title + stats + new task */}
+      <div className="flex items-start sm:items-center justify-between gap-3 mb-4">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Board</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage and track your work</p>
+          <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-foreground">Board</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Manage and track your work</p>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <div className="hidden sm:flex items-center gap-2">
             <Stat label="Total" value={total} />
             <Stat label="Done" value={completed} variant="success" />
             {overdue > 0 && <Stat label="Overdue" value={overdue} variant="destructive" />}
           </div>
-          <Button onClick={onNewTask} size="sm" className="gap-1.5 ml-2">
+          <Button onClick={onNewTask} size="sm" className="gap-1.5">
             <Plus className="h-4 w-4" />
-            New Task
+            <span className="hidden sm:inline">New Task</span>
+            <span className="sm:hidden">New</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        {/* Search */}
-        <div className="relative w-56">
+      {/* Mobile stats row */}
+      <div className="flex sm:hidden items-center gap-2 mb-3">
+        <Stat label="Total" value={total} />
+        <Stat label="Done" value={completed} variant="success" />
+        {overdue > 0 && <Stat label="Overdue" value={overdue} variant="destructive" />}
+      </div>
+
+      {/* Filter row */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative w-full sm:w-56">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search tasks..."
             value={filters.search}
             onChange={e => update({ search: e.target.value })}
-            className="pl-8 h-8 text-sm"
+            className="pl-8 h-8 text-sm w-full"
           />
         </div>
 
-        {/* Priority filter */}
         <Select value={filters.priority} onValueChange={v => v && update({ priority: v as FilterState['priority'] })}>
-          <SelectTrigger className="h-8 w-36 text-sm">
+          <SelectTrigger className="h-8 w-full sm:w-36 text-sm">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
@@ -86,10 +94,9 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
           </SelectContent>
         </Select>
 
-        {/* Assignee filter */}
         {members.length > 0 && (
           <Select value={filters.assigneeId} onValueChange={v => v && update({ assigneeId: v })}>
-            <SelectTrigger className="h-8 w-40 text-sm">
+            <SelectTrigger className="h-8 w-full sm:w-40 text-sm">
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
             <SelectContent>
@@ -101,10 +108,9 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
           </Select>
         )}
 
-        {/* Label filter */}
         {labels.length > 0 && (
           <Select value={filters.labelId} onValueChange={v => v && update({ labelId: v })}>
-            <SelectTrigger className="h-8 w-36 text-sm">
+            <SelectTrigger className="h-8 w-full sm:w-36 text-sm">
               <SelectValue placeholder="Label" />
             </SelectTrigger>
             <SelectContent>
@@ -121,7 +127,6 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
           </Select>
         )}
 
-        {/* Clear filters */}
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 gap-1 text-muted-foreground">
             <X className="h-3.5 w-3.5" />

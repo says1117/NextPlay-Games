@@ -128,7 +128,7 @@ export function Board() {
         onNewTask={() => setNewTaskOpen(true)}
       />
 
-      <div className="flex gap-4 p-6 overflow-x-auto">
+      <div className="flex gap-4 p-4 sm:p-6 overflow-x-auto snap-x snap-mandatory sm:snap-none pb-6" style={{ scrollbarWidth: 'thin' }}>
         <DragDropContext onDragEnd={onDragEnd}>
           {COLUMNS.map(col => (
             <Column

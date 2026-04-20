@@ -19,7 +19,7 @@ const columnColors: Record<TaskStatus, string> = {
 
 export const Column = memo(function Column({ status, label, tasks, onTaskClick }: ColumnProps) {
   return (
-    <div className="flex flex-col w-72 shrink-0">
+    <div className="flex flex-col w-[85vw] sm:w-72 shrink-0 snap-center sm:snap-align-none">
       {/* Column header */}
       <div className="flex items-center gap-2 mb-3 px-1">
         <span className={`h-2 w-2 rounded-full ${columnColors[status]}`} />
