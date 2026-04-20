@@ -49,10 +49,11 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   const [editingDescription, setEditingDescription] = useState(false)
   const [descriptionDraft, setDescriptionDraft] = useState('')
   const [editingDueDate, setEditingDueDate] = useState(false)
-  const [dueDateDraft, setDueDateDraft] = useState('')
 
   const titleInputRef = useRef<HTMLInputElement>(null)
   const descriptionRef = useRef<HTMLTextAreaElement>(null)
+  // Uncontrolled ref for due date — avoids base-ui Sheet event interception
+  const dueDateEditRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (task) {
@@ -125,10 +126,11 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
 
   async function saveDueDate() {
     if (!localTask) { setEditingDueDate(false); return }
-    const newDate = dueDateDraft || null
-    if (newDate === (localTask.due_date ?? null)) { setEditingDueDate(false); return }
+    const newDate = dueDateEditRef.current?.value || ''
+    // Only skip if user left it completely blank and there was no existing date
+    if (!newDate && !localTask.due_date) { setEditingDueDate(false); return }
     try {
-      const updated = await updateTask(localTask.id, { due_date: newDate ?? undefined })
+      const updated = await updateTask(localTask.id, { due_date: newDate || undefined })
       setLocalTask(updated)
       onTaskUpdated(updated)
     } catch {
@@ -364,9 +366,9 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
               {editingDueDate ? (
                 <div className="flex items-center gap-1.5">
                   <input
+                    ref={dueDateEditRef}
                     type="date"
-                    value={dueDateDraft}
-                    onChange={e => setDueDateDraft(e.target.value)}
+                    defaultValue={localTask.due_date ?? ''}
                     className="h-8 flex-1 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
                     autoFocus
                   />
@@ -380,7 +382,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
               ) : (
                 <button
                   className="group flex items-center gap-1.5 text-left"
-                  onClick={() => { setDueDateDraft(localTask.due_date ?? ''); setEditingDueDate(true) }}
+                  onClick={() => setEditingDueDate(true)}
                 >
                   {localTask.due_date ? (
                     <span className="text-sm text-foreground group-hover:text-foreground/80 transition-colors">
