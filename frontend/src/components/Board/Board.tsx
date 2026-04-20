@@ -7,6 +7,7 @@ import { BoardHeader, type FilterState } from './BoardHeader'
 import { TaskDetailPanel } from '@/components/Task/TaskDetailPanel'
 import { NewTaskDialog } from '@/components/Task/NewTaskDialog'
 import { TeamDialog } from '@/components/Team/TeamDialog'
+import { LabelsDialog } from '@/components/Labels/LabelsDialog'
 import type { Task, TaskStatus, Member, Label } from '@/types'
 import { getTasks, updateTask, getMembers, getLabels } from '@/lib/api'
 
@@ -32,6 +33,7 @@ export function Board() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [newTaskOpen, setNewTaskOpen] = useState(false)
   const [teamOpen, setTeamOpen] = useState(false)
+  const [labelsOpen, setLabelsOpen] = useState(false)
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS)
 
   useEffect(() => {
@@ -129,6 +131,7 @@ export function Board() {
         onFiltersChange={setFilters}
         onNewTask={() => setNewTaskOpen(true)}
         onManageTeam={() => setTeamOpen(true)}
+        onManageLabels={() => setLabelsOpen(true)}
       />
 
       <div className="flex gap-4 p-4 sm:p-6 overflow-x-auto snap-x snap-mandatory sm:snap-none pb-6" style={{ scrollbarWidth: 'thin' }}>
@@ -164,6 +167,13 @@ export function Board() {
         onClose={() => setTeamOpen(false)}
         members={members}
         onMembersChange={setMembers}
+      />
+
+      <LabelsDialog
+        open={labelsOpen}
+        onClose={() => setLabelsOpen(false)}
+        labels={labels}
+        onLabelsChange={setLabels}
       />
     </>
   )
