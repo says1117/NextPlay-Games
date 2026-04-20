@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -20,20 +20,10 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
   const [priority, setPriority] = useState('medium')
   const [status, setStatus] = useState('todo')
   const [loading, setLoading] = useState(false)
-  // Track due date in state AND via ref — belt and suspenders against
-  // base-ui Dialog event interception on different browsers.
   const [dueDate, setDueDate] = useState('')
-  const dueDateRef = useRef<HTMLInputElement>(null)
-
-  function captureDueDate(e: React.SyntheticEvent<HTMLInputElement>) {
-    const v = (e.target as HTMLInputElement).value
-    if (v) setDueDate(v)
-  }
 
   async function handleSubmit() {
     if (!title.trim()) return
-    // Prefer state value, fall back to direct DOM read
-    const finalDate = dueDate || dueDateRef.current?.value || ''
     setLoading(true)
     try {
       const task = await createTask({
@@ -41,7 +31,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
         description: description || undefined,
         priority: priority as Task['priority'],
         status: status as Task['status'],
-        due_date: finalDate || undefined,
+        due_date: dueDate || undefined,
       })
       onCreated(task)
       onClose()
@@ -112,16 +102,12 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Due Date</label>
             <input
-              ref={dueDateRef}
-              type="date"
-              onChange={captureDueDate}
-              onInput={captureDueDate}
-              onBlur={captureDueDate}
-              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
+              type="text"
+              placeholder="YYYY-MM-DD — e.g. 2026-05-01"
+              value={dueDate}
+              onChange={e => setDueDate(e.target.value)}
+              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring placeholder:text-muted-foreground/50"
             />
-            {dueDate && (
-              <p className="text-[11px] text-emerald-600 mt-0.5">✓ {dueDate}</p>
-            )}
           </div>
         </div>
 
