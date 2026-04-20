@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { format, parseISO } from 'date-fns'
+import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
@@ -107,15 +107,9 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Due Date</label>
             <Popover open={calOpen} onOpenChange={setCalOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full h-8 justify-start text-sm font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-                  {dueDate ? format(dueDate, 'MMM d, yyyy') : <span className="text-muted-foreground">Pick a date</span>}
-                </Button>
+              <PopoverTrigger className="inline-flex h-8 w-full items-center justify-start gap-2 rounded-md border border-input bg-background px-3 text-sm font-normal hover:bg-accent hover:text-accent-foreground">
+                <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
+                {dueDate ? format(dueDate, 'MMM d, yyyy') : <span className="text-muted-foreground">Pick a date</span>}
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
