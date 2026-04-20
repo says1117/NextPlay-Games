@@ -136,7 +136,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {labels.length > 0 && (
           <Select value={filters.labelId} onValueChange={v => v && update({ labelId: v })}>
-            <SelectTrigger className="h-9 w-full sm:w-36 text-sm border-border/60 bg-muted/30">
+            <SelectTrigger className="h-8.5w-full sm:w-36 text-sm border-border/60 bg-muted/30">
               <SelectValue placeholder="Label" />
             </SelectTrigger>
             <SelectContent>
