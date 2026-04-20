@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Droppable } from '@hello-pangea/dnd'
 import { TaskCard } from '@/components/Task/TaskCard'
 import type { Task, TaskStatus } from '@/types'
@@ -16,7 +17,7 @@ const columnColors: Record<TaskStatus, string> = {
   done: 'bg-emerald-500',
 }
 
-export function Column({ status, label, tasks, onTaskClick }: ColumnProps) {
+export const Column = memo(function Column({ status, label, tasks, onTaskClick }: ColumnProps) {
   return (
     <div className="flex flex-col w-72 shrink-0">
       {/* Column header */}
@@ -62,4 +63,4 @@ export function Column({ status, label, tasks, onTaskClick }: ColumnProps) {
       </Droppable>
     </div>
   )
-}
+})

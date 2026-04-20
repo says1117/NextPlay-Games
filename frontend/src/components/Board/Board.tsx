@@ -77,6 +77,8 @@ export function Board() {
     }
   }, [])
 
+  const handleTaskClick = useCallback((task: Task) => setSelectedTask(task), [])
+
   function handleTaskUpdated(updated: Task) {
     setTasks(prev => prev.map(t => t.id === updated.id ? updated : t))
     setSelectedTask(updated)
@@ -131,7 +133,7 @@ export function Board() {
               status={col.status}
               label={col.label}
               tasks={filteredTasks.filter(t => t.status === col.status)}
-              onTaskClick={setSelectedTask}
+              onTaskClick={handleTaskClick}
             />
           ))}
         </DragDropContext>
