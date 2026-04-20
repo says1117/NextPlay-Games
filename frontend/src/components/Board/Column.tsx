@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, type ReactElement } from 'react'
 import { Droppable } from '@hello-pangea/dnd'
 import { TaskCard } from '@/components/Task/TaskCard'
 import type { Task, TaskStatus } from '@/types'
@@ -40,7 +40,7 @@ const columnConfig: Record<TaskStatus, { dot: string; empty: string; bg: string;
 function EmptyState({ status }: { status: TaskStatus }) {
   const config = columnConfig[status]
 
-  const icons: Record<TaskStatus, JSX.Element> = {
+  const icons: Record<TaskStatus, ReactElement> = {
     todo: (
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" className={config.empty}>
         <rect x="4" y="6" width="24" height="4" rx="2" fill="currentColor" />
