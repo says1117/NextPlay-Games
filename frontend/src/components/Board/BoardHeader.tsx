@@ -1,4 +1,4 @@
-import { Search, Plus, X } from 'lucide-react'
+import { Search, Plus, X, Users } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -20,9 +20,10 @@ interface BoardHeaderProps {
   labels: Label[]
   onFiltersChange: (f: FilterState) => void
   onNewTask: () => void
+  onManageTeam: () => void
 }
 
-export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, onNewTask }: BoardHeaderProps) {
+export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, onNewTask, onManageTeam }: BoardHeaderProps) {
   const total = tasks.length
   const completed = tasks.filter(t => t.status === 'done').length
   const overdue = tasks.filter(t => {
@@ -54,6 +55,10 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
             <Stat label="Done" value={completed} variant="success" />
             {overdue > 0 && <Stat label="Overdue" value={overdue} variant="destructive" />}
           </div>
+          <Button variant="outline" size="sm" onClick={onManageTeam} className="gap-1.5">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Team</span>
+          </Button>
           <Button onClick={onNewTask} size="sm" className="gap-1.5">
             <Plus className="h-4 w-4" />
             <span className="hidden sm:inline">New Task</span>
