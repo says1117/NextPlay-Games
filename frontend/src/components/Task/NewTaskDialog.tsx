@@ -101,11 +101,11 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           </div>
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Due Date</label>
-            <Input
+            <input
               type="date"
               value={dueDate}
               onChange={e => setDueDate(e.target.value)}
-              className="h-8 text-sm"
+              className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
             />
           </div>
         </div>

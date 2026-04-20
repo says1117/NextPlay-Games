@@ -239,42 +239,52 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0">
+      <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0" showCloseButton={false}>
         <SheetHeader className="px-6 py-4 border-b">
-          <div className="flex items-start justify-between gap-2">
-            {editingTitle ? (
-              <div className="flex items-center gap-1.5 flex-1">
-                <Input
-                  ref={titleInputRef}
-                  value={titleDraft}
-                  onChange={e => setTitleDraft(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') saveTitle()
-                    if (e.key === 'Escape') setEditingTitle(false)
-                  }}
-                  className="h-7 text-sm font-semibold flex-1"
-                />
-                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={saveTitle}>
-                  <Check className="h-3.5 w-3.5 text-emerald-600" />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => setEditingTitle(false)}>
-                  <X className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ) : (
-              <button
-                className="group flex items-start gap-1.5 flex-1 text-left"
-                onClick={() => { setTitleDraft(localTask.title); setEditingTitle(true) }}
-              >
-                <SheetTitle className="text-base font-semibold leading-snug text-left flex-1">
-                  {localTask.title}
-                </SheetTitle>
-                <Pencil className="h-3.5 w-3.5 mt-1 text-muted-foreground opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
-              </button>
-            )}
-            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleDelete}>
-              <Trash2 className="h-4 w-4 text-muted-foreground" />
-            </Button>
+          <div className="flex items-start gap-2">
+            {/* Title */}
+            <div className="flex-1 min-w-0">
+              {editingTitle ? (
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    ref={titleInputRef}
+                    value={titleDraft}
+                    onChange={e => setTitleDraft(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') saveTitle()
+                      if (e.key === 'Escape') setEditingTitle(false)
+                    }}
+                    className="h-7 text-sm font-semibold flex-1"
+                  />
+                  <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={saveTitle}>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => setEditingTitle(false)}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  className="group flex items-start gap-1.5 w-full text-left"
+                  onClick={() => { setTitleDraft(localTask.title); setEditingTitle(true) }}
+                >
+                  <SheetTitle className="text-base font-semibold leading-snug text-left flex-1">
+                    {localTask.title}
+                  </SheetTitle>
+                  <Pencil className="h-3.5 w-3.5 mt-1 text-muted-foreground opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
+                </button>
+              )}
+            </div>
+
+            {/* Trash + Close side by side, no overlap with absolute X */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleDelete}>
+                <Trash2 className="h-4 w-4 text-muted-foreground" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+                <X className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </div>
           </div>
         </SheetHeader>
 
@@ -353,11 +363,11 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Due Date</label>
               {editingDueDate ? (
                 <div className="flex items-center gap-1.5">
-                  <Input
+                  <input
                     type="date"
                     value={dueDateDraft}
                     onChange={e => setDueDateDraft(e.target.value)}
-                    className="h-8 text-sm flex-1"
+                    className="h-8 flex-1 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
                     autoFocus
                   />
                   <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={saveDueDate}>
