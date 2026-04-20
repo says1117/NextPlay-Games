@@ -128,13 +128,18 @@ func CreateTask(c *gin.Context) {
 		input.Priority = "medium"
 	}
 
+	var dueDateCreate interface{}
+	if input.DueDate != nil && *input.DueDate != "" {
+		dueDateCreate = *input.DueDate
+	}
+
 	var t Task
 	err := db.Pool.QueryRow(context.Background(), `
 		INSERT INTO tasks (user_id, title, description, status, priority, due_date)
-		VALUES ($1, $2, $3, $4, $5, $6::date)
+		VALUES ($1, $2, $3, $4, $5, CASE WHEN $6::text IS NOT NULL THEN to_date($6::text, 'YYYY-MM-DD') ELSE NULL END)
 		RETURNING id, user_id, title, description, status, priority,
 		          to_char(due_date, 'YYYY-MM-DD'), position, created_at, updated_at
-	`, userID, input.Title, input.Description, input.Status, input.Priority, input.DueDate).Scan(
+	`, userID, input.Title, input.Description, input.Status, input.Priority, dueDateCreate).Scan(
 		&t.ID, &t.UserID, &t.Title, &t.Description,
 		&t.Status, &t.Priority, &t.DueDate, &t.Position,
 		&t.CreatedAt, &t.UpdatedAt,
@@ -172,6 +177,11 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
+	var dueDateUpdate interface{}
+	if input.DueDate != nil && *input.DueDate != "" {
+		dueDateUpdate = *input.DueDate
+	}
+
 	var t Task
 	err = db.Pool.QueryRow(context.Background(), `
 		UPDATE tasks SET
@@ -179,14 +189,14 @@ func UpdateTask(c *gin.Context) {
 			description = COALESCE($4, description),
 			status      = COALESCE($5, status),
 			priority    = COALESCE($6, priority),
-			due_date    = COALESCE($7::date, due_date),
+			due_date    = CASE WHEN $7::text IS NOT NULL THEN to_date($7::text, 'YYYY-MM-DD') ELSE due_date END,
 			position    = COALESCE($8, position)
 		WHERE id = $1 AND user_id = $2
 		RETURNING id, user_id, title, description, status, priority,
 		          to_char(due_date, 'YYYY-MM-DD'), position, created_at, updated_at
 	`, taskID, userID,
 		input.Title, input.Description, input.Status,
-		input.Priority, input.DueDate, input.Position,
+		input.Priority, dueDateUpdate, input.Position,
 	).Scan(
 		&t.ID, &t.UserID, &t.Title, &t.Description,
 		&t.Status, &t.Priority, &t.DueDate, &t.Position,
