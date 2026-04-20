@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { format, parseISO } from 'date-fns'
 import { toast } from 'sonner'
-import { Trash2, Send, X, Tag, UserPlus } from 'lucide-react'
+import { Trash2, Send, X, Tag, UserPlus, Pencil, Check } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -42,12 +43,41 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   const [submitting, setSubmitting] = useState(false)
   const [localTask, setLocalTask] = useState<Task | null>(null)
 
+  // Inline editing state
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleDraft, setTitleDraft] = useState('')
+  const [editingDescription, setEditingDescription] = useState(false)
+  const [descriptionDraft, setDescriptionDraft] = useState('')
+  const [editingDueDate, setEditingDueDate] = useState(false)
+  const [dueDateDraft, setDueDateDraft] = useState('')
+
+  const titleInputRef = useRef<HTMLInputElement>(null)
+  const descriptionRef = useRef<HTMLTextAreaElement>(null)
+
   useEffect(() => {
     if (task) {
       setLocalTask(task)
+      setEditingTitle(false)
+      setEditingDescription(false)
+      setEditingDueDate(false)
       loadData(task.id)
     }
   }, [task])
+
+  useEffect(() => {
+    if (editingTitle && titleInputRef.current) {
+      titleInputRef.current.focus()
+      titleInputRef.current.select()
+    }
+  }, [editingTitle])
+
+  useEffect(() => {
+    if (editingDescription && descriptionRef.current) {
+      descriptionRef.current.focus()
+      const len = descriptionRef.current.value.length
+      descriptionRef.current.setSelectionRange(len, len)
+    }
+  }, [editingDescription])
 
   async function loadData(taskId: string) {
     const [c, a, m, l] = await Promise.all([
@@ -60,6 +90,52 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
     setActivity(a)
     setMembers(m)
     setLabels(l)
+  }
+
+  async function saveTitle() {
+    if (!localTask || !titleDraft.trim() || titleDraft.trim() === localTask.title) {
+      setEditingTitle(false)
+      return
+    }
+    try {
+      const updated = await updateTask(localTask.id, { title: titleDraft.trim() })
+      setLocalTask(updated)
+      onTaskUpdated(updated)
+    } catch {
+      toast.error('Failed to update title')
+    } finally {
+      setEditingTitle(false)
+    }
+  }
+
+  async function saveDescription() {
+    if (!localTask) { setEditingDescription(false); return }
+    const newDesc = descriptionDraft.trim() || null
+    if (newDesc === (localTask.description ?? null)) { setEditingDescription(false); return }
+    try {
+      const updated = await updateTask(localTask.id, { description: newDesc ?? undefined })
+      setLocalTask(updated)
+      onTaskUpdated(updated)
+    } catch {
+      toast.error('Failed to update description')
+    } finally {
+      setEditingDescription(false)
+    }
+  }
+
+  async function saveDueDate() {
+    if (!localTask) { setEditingDueDate(false); return }
+    const newDate = dueDateDraft || null
+    if (newDate === (localTask.due_date ?? null)) { setEditingDueDate(false); return }
+    try {
+      const updated = await updateTask(localTask.id, { due_date: newDate ?? undefined })
+      setLocalTask(updated)
+      onTaskUpdated(updated)
+    } catch {
+      toast.error('Failed to update due date')
+    } finally {
+      setEditingDueDate(false)
+    }
   }
 
   async function handleComment() {
@@ -85,8 +161,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   }
 
   async function handleStatusChange(status: string | null) {
-    if (!status) return
-    if (!localTask) return
+    if (!status || !localTask) return
     try {
       const updated = await updateTask(localTask.id, { status: status as Task['status'] })
       setLocalTask(updated)
@@ -99,8 +174,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   }
 
   async function handlePriorityChange(priority: string | null) {
-    if (!priority) return
-    if (!localTask) return
+    if (!priority || !localTask) return
     try {
       const updated = await updateTask(localTask.id, { priority: priority as Task['priority'] })
       setLocalTask(updated)
@@ -111,8 +185,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   }
 
   async function handleAddAssignee(memberId: string | null) {
-    if (!memberId) return
-    if (!localTask) return
+    if (!memberId || !localTask) return
     await addAssignee(localTask.id, memberId)
     const member = members.find(m => m.id === memberId)
     if (member) {
@@ -133,8 +206,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
   }
 
   async function handleAddLabel(labelId: string | null) {
-    if (!labelId) return
-    if (!localTask) return
+    if (!labelId || !localTask) return
     await addTaskLabel(localTask.id, labelId)
     const label = labels.find(l => l.id === labelId)
     if (label) {
@@ -170,9 +242,36 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
       <SheetContent className="w-full sm:max-w-lg flex flex-col p-0 gap-0">
         <SheetHeader className="px-6 py-4 border-b">
           <div className="flex items-start justify-between gap-2">
-            <SheetTitle className="text-base font-semibold leading-snug text-left">
-              {localTask.title}
-            </SheetTitle>
+            {editingTitle ? (
+              <div className="flex items-center gap-1.5 flex-1">
+                <Input
+                  ref={titleInputRef}
+                  value={titleDraft}
+                  onChange={e => setTitleDraft(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') saveTitle()
+                    if (e.key === 'Escape') setEditingTitle(false)
+                  }}
+                  className="h-7 text-sm font-semibold flex-1"
+                />
+                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={saveTitle}>
+                  <Check className="h-3.5 w-3.5 text-emerald-600" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={() => setEditingTitle(false)}>
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            ) : (
+              <button
+                className="group flex items-start gap-1.5 flex-1 text-left"
+                onClick={() => { setTitleDraft(localTask.title); setEditingTitle(true) }}
+              >
+                <SheetTitle className="text-base font-semibold leading-snug text-left flex-1">
+                  {localTask.title}
+                </SheetTitle>
+                <Pencil className="h-3.5 w-3.5 mt-1 text-muted-foreground opacity-0 group-hover:opacity-60 transition-opacity shrink-0" />
+              </button>
+            )}
             <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={handleDelete}>
               <Trash2 className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -211,13 +310,81 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
               </div>
             </div>
 
+            {/* Description */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Description</label>
+              {editingDescription ? (
+                <div className="space-y-1.5">
+                  <Textarea
+                    ref={descriptionRef}
+                    value={descriptionDraft}
+                    onChange={e => setDescriptionDraft(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Escape') setEditingDescription(false)
+                    }}
+                    placeholder="Add a description…"
+                    className="text-sm min-h-[80px] resize-none"
+                  />
+                  <div className="flex gap-1.5">
+                    <Button size="sm" className="h-7 text-xs" onClick={saveDescription}>Save</Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => setEditingDescription(false)}>Cancel</Button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  className="group w-full text-left"
+                  onClick={() => { setDescriptionDraft(localTask.description ?? ''); setEditingDescription(true) }}
+                >
+                  {localTask.description ? (
+                    <p className="text-sm text-foreground whitespace-pre-wrap group-hover:text-foreground/80 transition-colors">
+                      {localTask.description}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground/50 italic group-hover:text-muted-foreground transition-colors">
+                      Add a description…
+                    </p>
+                  )}
+                </button>
+              )}
+            </div>
+
             {/* Due Date */}
-            {localTask.due_date && (
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Due Date</label>
-                <p className="text-sm text-foreground">{format(parseISO(localTask.due_date), 'MMMM d, yyyy')}</p>
-              </div>
-            )}
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Due Date</label>
+              {editingDueDate ? (
+                <div className="flex items-center gap-1.5">
+                  <Input
+                    type="date"
+                    value={dueDateDraft}
+                    onChange={e => setDueDateDraft(e.target.value)}
+                    className="h-8 text-sm flex-1"
+                    autoFocus
+                  />
+                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={saveDueDate}>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                  </Button>
+                  <Button size="icon" variant="ghost" className="h-8 w-8 shrink-0" onClick={() => setEditingDueDate(false)}>
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  className="group flex items-center gap-1.5 text-left"
+                  onClick={() => { setDueDateDraft(localTask.due_date ?? ''); setEditingDueDate(true) }}
+                >
+                  {localTask.due_date ? (
+                    <span className="text-sm text-foreground group-hover:text-foreground/80 transition-colors">
+                      {format(parseISO(localTask.due_date), 'MMMM d, yyyy')}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground/50 italic group-hover:text-muted-foreground transition-colors">
+                      No due date
+                    </span>
+                  )}
+                  <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-60 transition-opacity" />
+                </button>
+              )}
+            </div>
 
             <Separator />
 
@@ -320,7 +487,7 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
 
               <div className="flex gap-2 pt-1">
                 <Textarea
-                  placeholder="Add a comment..."
+                  placeholder="Add a comment…"
                   value={newComment}
                   onChange={e => setNewComment(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleComment() } }}
