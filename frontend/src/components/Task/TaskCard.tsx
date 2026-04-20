@@ -1,6 +1,7 @@
+import { memo } from 'react'
 import { Draggable } from '@hello-pangea/dnd'
 import { format, isAfter, parseISO, startOfToday } from 'date-fns'
-import { CalendarDays, AlertCircle, ArrowUp, ArrowRight, ArrowDown, Minus } from 'lucide-react'
+import { CalendarDays, AlertCircle, ArrowUp, ArrowRight, ArrowDown } from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import type { Task } from '@/types'
 
@@ -11,18 +12,38 @@ interface TaskCardProps {
 }
 
 const priorityConfig = {
-  urgent: { icon: AlertCircle, class: 'text-red-500' },
-  high: { icon: ArrowUp, class: 'text-orange-500' },
-  medium: { icon: ArrowRight, class: 'text-yellow-500' },
-  low: { icon: ArrowDown, class: 'text-blue-400' },
+  urgent: {
+    icon: AlertCircle,
+    iconClass: 'text-red-600',
+    chipClass: 'bg-red-50 text-red-600',
+    label: 'Urgent',
+  },
+  high: {
+    icon: ArrowUp,
+    iconClass: 'text-orange-500',
+    chipClass: 'bg-orange-50 text-orange-600',
+    label: 'High',
+  },
+  medium: {
+    icon: ArrowRight,
+    iconClass: 'text-amber-500',
+    chipClass: 'bg-amber-50 text-amber-600',
+    label: 'Medium',
+  },
+  low: {
+    icon: ArrowDown,
+    iconClass: 'text-blue-400',
+    chipClass: 'bg-blue-50 text-blue-500',
+    label: 'Low',
+  },
 }
 
-export function TaskCard({ task, index, onClick }: TaskCardProps) {
+export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCardProps) {
   const isOverdue = task.due_date && task.status !== 'done'
     && isAfter(startOfToday(), parseISO(task.due_date))
 
-  const Priority = priorityConfig[task.priority] ?? { icon: Minus, class: 'text-muted-foreground' }
-  const PriorityIcon = Priority.icon
+  const priority = priorityConfig[task.priority] ?? priorityConfig.medium
+  const PriorityIcon = priority.icon
 
   return (
     <Draggable draggableId={task.id} index={index}>
@@ -33,70 +54,80 @@ export function TaskCard({ task, index, onClick }: TaskCardProps) {
           {...provided.dragHandleProps}
           onClick={onClick}
           className={`
-            group rounded-lg border bg-card p-3 cursor-pointer select-none
+            group rounded-lg bg-card border border-border cursor-pointer select-none
             transition-all duration-150
             ${snapshot.isDragging
-              ? 'shadow-lg rotate-1 border-primary/30'
-              : 'shadow-sm hover:shadow-md hover:border-border/80'
+              ? 'shadow-xl rotate-1 border-border/60 scale-[1.02]'
+              : 'shadow-sm hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] hover:border-border/70 hover:-translate-y-px'
             }
           `}
         >
-          {/* Priority + Title */}
-          <div className="flex items-start gap-2 mb-2">
-            <PriorityIcon className={`h-3.5 w-3.5 mt-0.5 shrink-0 ${Priority.class}`} />
-            <p className="text-sm font-medium leading-snug text-card-foreground line-clamp-2 flex-1">
+          <div className="p-3">
+            {/* Title */}
+            <p className="text-[13px] font-medium leading-snug text-foreground line-clamp-2 mb-2.5">
               {task.title}
             </p>
-          </div>
 
-          {/* Labels */}
-          {task.labels.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {task.labels.map(label => (
-                <span
-                  key={label.id}
-                  className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium"
-                  style={{ backgroundColor: label.color + '22', color: label.color }}
-                >
-                  {label.name}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Footer: due date + assignees */}
-          <div className="flex items-center justify-between mt-2">
-            {task.due_date ? (
-              <div className={`flex items-center gap-1 text-[11px] font-medium ${
-                isOverdue ? 'text-red-500' : 'text-muted-foreground'
-              }`}>
-                <CalendarDays className="h-3 w-3" />
-                {isOverdue ? 'Overdue · ' : ''}
-                {format(parseISO(task.due_date), 'MMM d')}
-              </div>
-            ) : <span />}
-
-            {task.assignees.length > 0 && (
-              <div className="flex -space-x-1.5">
-                {task.assignees.slice(0, 3).map(m => (
-                  <Avatar key={m.id} className="h-5 w-5 border border-background text-[9px]">
-                    <AvatarFallback className="bg-primary/10 text-primary text-[9px]">
-                      {m.name.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+            {/* Labels */}
+            {task.labels.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2.5">
+                {task.labels.map(label => (
+                  <span
+                    key={label.id}
+                    className="inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-semibold tracking-wide"
+                    style={{ backgroundColor: label.color + '18', color: label.color }}
+                  >
+                    {label.name}
+                  </span>
                 ))}
-                {task.assignees.length > 3 && (
-                  <Avatar className="h-5 w-5 border border-background">
-                    <AvatarFallback className="bg-muted text-muted-foreground text-[9px]">
-                      +{task.assignees.length - 3}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
               </div>
             )}
+
+            {/* Footer */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                {/* Priority chip */}
+                <span className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${priority.chipClass}`}>
+                  <PriorityIcon className="h-2.5 w-2.5" />
+                  {priority.label}
+                </span>
+
+                {/* Due date */}
+                {task.due_date && (
+                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${
+                    isOverdue
+                      ? 'text-red-600 bg-red-50 px-1.5 py-0.5 rounded'
+                      : 'text-muted-foreground'
+                  }`}>
+                    <CalendarDays className="h-2.5 w-2.5" />
+                    {isOverdue ? 'Overdue' : format(parseISO(task.due_date), 'MMM d')}
+                  </span>
+                )}
+              </div>
+
+              {/* Assignees */}
+              {task.assignees.length > 0 && (
+                <div className="flex -space-x-1">
+                  {task.assignees.slice(0, 3).map(m => (
+                    <Avatar key={m.id} className="h-5 w-5 border-[1.5px] border-card">
+                      <AvatarFallback className="bg-foreground/10 text-foreground text-[8px] font-bold">
+                        {m.name.slice(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
+                  {task.assignees.length > 3 && (
+                    <Avatar className="h-5 w-5 border-[1.5px] border-card">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-[8px]">
+                        +{task.assignees.length - 3}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
     </Draggable>
   )
-}
+})
