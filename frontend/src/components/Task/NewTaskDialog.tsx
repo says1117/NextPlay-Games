@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
@@ -19,11 +19,14 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState('medium')
   const [status, setStatus] = useState('todo')
-  const [dueDate, setDueDate] = useState('')
   const [loading, setLoading] = useState(false)
+  // Read due date directly from the DOM at submit time — avoids base-ui Dialog
+  // event interception issues that prevent controlled state from updating.
+  const dueDateRef = useRef<HTMLInputElement>(null)
 
   async function handleSubmit() {
     if (!title.trim()) return
+    const dueDate = dueDateRef.current?.value ?? ''
     setLoading(true)
     try {
       const task = await createTask({
@@ -39,7 +42,6 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
       setDescription('')
       setPriority('medium')
       setStatus('todo')
-      setDueDate('')
       toast.success('Task created')
     } catch {
       toast.error('Failed to create task')
@@ -102,9 +104,8 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           <div className="space-y-1">
             <label className="text-xs text-muted-foreground">Due Date</label>
             <input
+              ref={dueDateRef}
               type="date"
-              value={dueDate}
-              onChange={e => setDueDate(e.target.value)}
               className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
             />
           </div>
