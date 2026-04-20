@@ -1,0 +1,19 @@
+# Environment files - never commit secrets
+.env
+.env.local
+.env.*.local
+*.local
+!*.example
+
+# Go
+backend/tmp/
+
+# Node
+node_modules/
+dist/
+
+# OS
+.DS_Store
+
+# Claude Code
+.claude/
