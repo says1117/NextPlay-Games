@@ -5,7 +5,6 @@ import { Trash2, Send, X, Tag, UserPlus } from 'lucide-react'
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
@@ -85,7 +84,8 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
     setComments(prev => prev.filter(c => c.id !== commentId))
   }
 
-  async function handleStatusChange(status: string) {
+  async function handleStatusChange(status: string | null) {
+    if (!status) return
     if (!localTask) return
     try {
       const updated = await updateTask(localTask.id, { status: status as Task['status'] })
@@ -98,7 +98,8 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
     }
   }
 
-  async function handlePriorityChange(priority: string) {
+  async function handlePriorityChange(priority: string | null) {
+    if (!priority) return
     if (!localTask) return
     try {
       const updated = await updateTask(localTask.id, { priority: priority as Task['priority'] })
@@ -109,7 +110,8 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
     }
   }
 
-  async function handleAddAssignee(memberId: string) {
+  async function handleAddAssignee(memberId: string | null) {
+    if (!memberId) return
     if (!localTask) return
     await addAssignee(localTask.id, memberId)
     const member = members.find(m => m.id === memberId)
@@ -130,7 +132,8 @@ export function TaskDetailPanel({ task, open, onClose, onTaskUpdated, onTaskDele
     onTaskUpdated(updated)
   }
 
-  async function handleAddLabel(labelId: string) {
+  async function handleAddLabel(labelId: string | null) {
+    if (!labelId) return
     if (!localTask) return
     await addTaskLabel(localTask.id, labelId)
     const label = labels.find(l => l.id === labelId)

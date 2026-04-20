@@ -73,7 +73,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
         </div>
 
         {/* Priority filter */}
-        <Select value={filters.priority} onValueChange={v => update({ priority: v as FilterState['priority'] })}>
+        <Select value={filters.priority} onValueChange={v => v && update({ priority: v as FilterState['priority'] })}>
           <SelectTrigger className="h-8 w-36 text-sm">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
@@ -88,7 +88,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {/* Assignee filter */}
         {members.length > 0 && (
-          <Select value={filters.assigneeId} onValueChange={v => update({ assigneeId: v })}>
+          <Select value={filters.assigneeId} onValueChange={v => v && update({ assigneeId: v })}>
             <SelectTrigger className="h-8 w-40 text-sm">
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
@@ -103,7 +103,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {/* Label filter */}
         {labels.length > 0 && (
-          <Select value={filters.labelId} onValueChange={v => update({ labelId: v })}>
+          <Select value={filters.labelId} onValueChange={v => v && update({ labelId: v })}>
             <SelectTrigger className="h-8 w-36 text-sm">
               <SelectValue placeholder="Label" />
             </SelectTrigger>

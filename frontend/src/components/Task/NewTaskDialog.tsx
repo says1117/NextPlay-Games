@@ -72,7 +72,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">Status</label>
-              <Select value={status} onValueChange={setStatus}>
+              <Select value={status} onValueChange={v => v && setStatus(v)}>
                 <SelectTrigger className="h-8 text-sm">
                   <SelectValue />
                 </SelectTrigger>
@@ -86,7 +86,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
             </div>
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">Priority</label>
-              <Select value={priority} onValueChange={setPriority}>
+              <Select value={priority} onValueChange={v => v && setPriority(v)}>
                 <SelectTrigger className="h-8 text-sm">
                   <SelectValue />
                 </SelectTrigger>

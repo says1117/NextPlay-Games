@@ -1,7 +1,6 @@
 import { Draggable } from '@hello-pangea/dnd'
 import { format, isAfter, parseISO, startOfToday } from 'date-fns'
 import { CalendarDays, AlertCircle, ArrowUp, ArrowRight, ArrowDown, Minus } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import type { Task } from '@/types'
 
