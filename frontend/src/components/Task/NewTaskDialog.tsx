@@ -20,13 +20,20 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
   const [priority, setPriority] = useState('medium')
   const [status, setStatus] = useState('todo')
   const [loading, setLoading] = useState(false)
-  // Read due date directly from the DOM at submit time — avoids base-ui Dialog
-  // event interception issues that prevent controlled state from updating.
+  // Track due date in state AND via ref — belt and suspenders against
+  // base-ui Dialog event interception on different browsers.
+  const [dueDate, setDueDate] = useState('')
   const dueDateRef = useRef<HTMLInputElement>(null)
+
+  function captureDueDate(e: React.SyntheticEvent<HTMLInputElement>) {
+    const v = (e.target as HTMLInputElement).value
+    if (v) setDueDate(v)
+  }
 
   async function handleSubmit() {
     if (!title.trim()) return
-    const dueDate = dueDateRef.current?.value ?? ''
+    // Prefer state value, fall back to direct DOM read
+    const finalDate = dueDate || dueDateRef.current?.value || ''
     setLoading(true)
     try {
       const task = await createTask({
@@ -34,7 +41,7 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
         description: description || undefined,
         priority: priority as Task['priority'],
         status: status as Task['status'],
-        due_date: dueDate || undefined,
+        due_date: finalDate || undefined,
       })
       onCreated(task)
       onClose()
@@ -42,7 +49,8 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
       setDescription('')
       setPriority('medium')
       setStatus('todo')
-      toast.success('Task created')
+      setDueDate('')
+      toast.success(task.due_date ? `Task created · due ${task.due_date}` : 'Task created')
     } catch {
       toast.error('Failed to create task')
     } finally {
@@ -106,8 +114,14 @@ export function NewTaskDialog({ open, onClose, onCreated }: NewTaskDialogProps) 
             <input
               ref={dueDateRef}
               type="date"
+              onChange={captureDueDate}
+              onInput={captureDueDate}
+              onBlur={captureDueDate}
               className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm outline-none focus-visible:border-ring"
             />
+            {dueDate && (
+              <p className="text-[11px] text-emerald-600 mt-0.5">✓ {dueDate}</p>
+            )}
           </div>
         </div>
 
