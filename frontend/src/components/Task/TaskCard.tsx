@@ -62,15 +62,15 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
             }
           `}
         >
-          <div className="p-5">
+          <div className="p-4">
             {/* Title */}
-            <p className="text-[15px] font-medium leading-snug text-foreground line-clamp-2 mb-3.5">
+            <p className="text-sm font-medium leading-snug text-foreground line-clamp-2 mb-3">
               {task.title}
             </p>
 
             {/* Labels */}
             {task.labels.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-3.5">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {task.labels.map(label => (
                   <span
                     key={label.id}
@@ -87,8 +87,8 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 {/* Priority chip */}
-                <span className={`inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs font-semibold ${priority.chipClass}`}>
-                  <PriorityIcon className="h-3.5 w-3.5" />
+                <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-semibold ${priority.chipClass}`}>
+                  <PriorityIcon className="h-3 w-3" />
                   {priority.label}
                 </span>
 
@@ -96,10 +96,10 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
                 {task.due_date && (
                   <span className={`inline-flex items-center gap-1 text-xs font-medium ${
                     isOverdue
-                      ? 'text-red-600 bg-red-50 px-2.5 py-1 rounded'
+                      ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded'
                       : 'text-muted-foreground'
                   }`}>
-                    <CalendarDays className="h-3.5 w-3.5" />
+                    <CalendarDays className="h-3 w-3" />
                     {isOverdue ? 'Overdue' : format(parseISO(task.due_date), 'MMM d')}
                   </span>
                 )}
