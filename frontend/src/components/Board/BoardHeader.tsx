@@ -42,15 +42,15 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
   }
 
   return (
-    <div className="border-b border-border bg-background px-4 sm:px-6 pt-4 pb-3">
+    <div className="border-b border-border bg-background px-4 sm:px-6 pt-4 pb-4">
       {/* Top row */}
       <div className="flex items-center justify-between gap-3 mb-3">
         <div className="flex items-center gap-4">
           <div>
-            <h1 className="text-[15px] font-semibold tracking-tight text-foreground">Board</h1>
+            <h1 className="text-base font-semibold tracking-tight text-foreground">Board</h1>
           </div>
           {/* Stats inline — desktop */}
-          <div className="hidden sm:flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1.5">
             <StatPill label="Tasks" value={total} />
             <StatPill label="Done" value={completed} variant="success" />
             {overdue > 0 && <StatPill label="Overdue" value={overdue} variant="overdue" />}
@@ -62,53 +62,53 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
             variant="ghost"
             size="sm"
             onClick={onManageLabels}
-            className="h-7 gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground px-2"
+            className="h-8 gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5"
           >
-            <Tag className="h-3.5 w-3.5" />
+            <Tag className="h-4 w-4" />
             <span className="hidden sm:inline">Labels</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={onManageTeam}
-            className="h-7 gap-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground px-2"
+            className="h-8 gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5"
           >
-            <Users className="h-3.5 w-3.5" />
+            <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Team</span>
           </Button>
-          <div className="w-px h-4 bg-border mx-0.5" />
+          <div className="w-px h-5 bg-border mx-0.5" />
           <Button
             onClick={onNewTask}
             size="sm"
-            className="h-7 gap-1.5 text-[11px] font-semibold px-3"
+            className="h-8 gap-1.5 text-xs font-semibold px-3.5"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             New Task
           </Button>
         </div>
       </div>
 
       {/* Mobile stats */}
-      <div className="flex sm:hidden items-center gap-1 mb-2.5">
+      <div className="flex sm:hidden items-center gap-1.5 mb-3">
         <StatPill label="Tasks" value={total} />
         <StatPill label="Done" value={completed} variant="success" />
         {overdue > 0 && <StatPill label="Overdue" value={overdue} variant="overdue" />}
       </div>
 
       {/* Filter row */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        <div className="relative w-full sm:w-52">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/60" />
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative w-full sm:w-56">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
           <Input
             placeholder="Search tasks…"
             value={filters.search}
             onChange={e => update({ search: e.target.value })}
-            className="pl-7 h-7 text-[12px] w-full border-border/60 bg-muted/30 focus:bg-background"
+            className="pl-8 h-8 text-sm w-full border-border/60 bg-muted/30 focus:bg-background"
           />
         </div>
 
         <Select value={filters.priority} onValueChange={v => v && update({ priority: v as FilterState['priority'] })}>
-          <SelectTrigger className="h-7 w-full sm:w-32 text-[12px] border-border/60 bg-muted/30">
+          <SelectTrigger className="h-8 w-full sm:w-36 text-sm border-border/60 bg-muted/30">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
@@ -122,7 +122,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {members.length > 0 && (
           <Select value={filters.assigneeId} onValueChange={v => v && update({ assigneeId: v })}>
-            <SelectTrigger className="h-7 w-full sm:w-36 text-[12px] border-border/60 bg-muted/30">
+            <SelectTrigger className="h-8 w-full sm:w-40 text-sm border-border/60 bg-muted/30">
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
             <SelectContent>
@@ -136,7 +136,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {labels.length > 0 && (
           <Select value={filters.labelId} onValueChange={v => v && update({ labelId: v })}>
-            <SelectTrigger className="h-7 w-full sm:w-32 text-[12px] border-border/60 bg-muted/30">
+            <SelectTrigger className="h-8 w-full sm:w-36 text-sm border-border/60 bg-muted/30">
               <SelectValue placeholder="Label" />
             </SelectTrigger>
             <SelectContent>
@@ -144,7 +144,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
               {labels.map(l => (
                 <SelectItem key={l.id} value={l.id}>
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
+                    <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
                     {l.name}
                   </div>
                 </SelectItem>
@@ -156,9 +156,9 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="inline-flex items-center gap-1 h-7 px-2 rounded text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1 h-8 px-2.5 rounded text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <X className="h-3 w-3" />
+            <X className="h-3.5 w-3.5" />
             Clear
           </button>
         )}
@@ -176,7 +176,7 @@ function StatPill({ label, value, variant }: { label: string; value: number; var
       : 'text-muted-foreground bg-muted'
 
   return (
-    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tabular-nums ${colorClass}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold tabular-nums ${colorClass}`}>
       {value}
       <span className="font-normal opacity-70">{label}</span>
     </span>

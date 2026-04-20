@@ -62,19 +62,19 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
             }
           `}
         >
-          <div className="p-3">
+          <div className="p-4">
             {/* Title */}
-            <p className="text-[13px] font-medium leading-snug text-foreground line-clamp-2 mb-2.5">
+            <p className="text-sm font-medium leading-snug text-foreground line-clamp-2 mb-3">
               {task.title}
             </p>
 
             {/* Labels */}
             {task.labels.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2.5">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {task.labels.map(label => (
                   <span
                     key={label.id}
-                    className="inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-semibold tracking-wide"
+                    className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide"
                     style={{ backgroundColor: label.color + '18', color: label.color }}
                   >
                     {label.name}
@@ -85,21 +85,21 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
 
             {/* Footer */}
             <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-2">
                 {/* Priority chip */}
-                <span className={`inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${priority.chipClass}`}>
-                  <PriorityIcon className="h-2.5 w-2.5" />
+                <span className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-semibold ${priority.chipClass}`}>
+                  <PriorityIcon className="h-3 w-3" />
                   {priority.label}
                 </span>
 
                 {/* Due date */}
                 {task.due_date && (
-                  <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${
+                  <span className={`inline-flex items-center gap-1 text-xs font-medium ${
                     isOverdue
-                      ? 'text-red-600 bg-red-50 px-1.5 py-0.5 rounded'
+                      ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded'
                       : 'text-muted-foreground'
                   }`}>
-                    <CalendarDays className="h-2.5 w-2.5" />
+                    <CalendarDays className="h-3 w-3" />
                     {isOverdue ? 'Overdue' : format(parseISO(task.due_date), 'MMM d')}
                   </span>
                 )}
@@ -107,17 +107,17 @@ export const TaskCard = memo(function TaskCard({ task, index, onClick }: TaskCar
 
               {/* Assignees */}
               {task.assignees.length > 0 && (
-                <div className="flex -space-x-1">
+                <div className="flex -space-x-1.5">
                   {task.assignees.slice(0, 3).map(m => (
-                    <Avatar key={m.id} className="h-5 w-5 border-[1.5px] border-card">
-                      <AvatarFallback className="bg-foreground/10 text-foreground text-[8px] font-bold">
+                    <Avatar key={m.id} className="h-6 w-6 border-2 border-card">
+                      <AvatarFallback className="bg-foreground/10 text-foreground text-[9px] font-bold">
                         {m.name.slice(0, 2).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   ))}
                   {task.assignees.length > 3 && (
-                    <Avatar className="h-5 w-5 border-[1.5px] border-card">
-                      <AvatarFallback className="bg-muted text-muted-foreground text-[8px]">
+                    <Avatar className="h-6 w-6 border-2 border-card">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-[9px]">
                         +{task.assignees.length - 3}
                       </AvatarFallback>
                     </Avatar>

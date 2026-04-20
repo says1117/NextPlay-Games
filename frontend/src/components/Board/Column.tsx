@@ -91,14 +91,14 @@ export const Column = memo(function Column({ status, label, tasks, onTaskClick }
   const config = columnConfig[status]
 
   return (
-    <div className="flex flex-col w-[85vw] sm:w-[272px] shrink-0 snap-center sm:snap-align-none">
+    <div className="flex flex-col w-[85vw] sm:w-[310px] shrink-0 snap-center sm:snap-align-none">
       {/* Column header */}
-      <div className="flex items-center gap-2 mb-2.5 px-0.5">
-        <span className={`h-2 w-2 rounded-full shrink-0 ${config.dot}`} />
-        <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground flex-1">
+      <div className="flex items-center gap-2 mb-3 px-0.5">
+        <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${config.dot}`} />
+        <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground flex-1">
           {label}
         </span>
-        <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-muted px-1.5 text-[10px] font-semibold text-muted-foreground tabular-nums">
+        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-xs font-semibold text-muted-foreground tabular-nums">
           {tasks.length}
         </span>
       </div>
