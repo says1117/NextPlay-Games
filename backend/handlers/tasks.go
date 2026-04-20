@@ -128,15 +128,18 @@ func CreateTask(c *gin.Context) {
 		input.Priority = "medium"
 	}
 
-	var dueDateCreate interface{}
+	var dueDateCreate *time.Time
 	if input.DueDate != nil && *input.DueDate != "" {
-		dueDateCreate = *input.DueDate
+		parsed, err := time.Parse("2006-01-02", *input.DueDate)
+		if err == nil {
+			dueDateCreate = &parsed
+		}
 	}
 
 	var t Task
 	err := db.Pool.QueryRow(context.Background(), `
 		INSERT INTO tasks (user_id, title, description, status, priority, due_date)
-		VALUES ($1, $2, $3, $4, $5, CASE WHEN $6::text IS NOT NULL THEN to_date($6::text, 'YYYY-MM-DD') ELSE NULL END)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id, user_id, title, description, status, priority,
 		          to_char(due_date, 'YYYY-MM-DD'), position, created_at, updated_at
 	`, userID, input.Title, input.Description, input.Status, input.Priority, dueDateCreate).Scan(
@@ -177,9 +180,12 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	var dueDateUpdate interface{}
+	var dueDateUpdate *time.Time
 	if input.DueDate != nil && *input.DueDate != "" {
-		dueDateUpdate = *input.DueDate
+		parsed, parseErr := time.Parse("2006-01-02", *input.DueDate)
+		if parseErr == nil {
+			dueDateUpdate = &parsed
+		}
 	}
 
 	var t Task
@@ -189,7 +195,7 @@ func UpdateTask(c *gin.Context) {
 			description = COALESCE($4, description),
 			status      = COALESCE($5, status),
 			priority    = COALESCE($6, priority),
-			due_date    = CASE WHEN $7::text IS NOT NULL THEN to_date($7::text, 'YYYY-MM-DD') ELSE due_date END,
+			due_date    = COALESCE($7, due_date),
 			position    = COALESCE($8, position)
 		WHERE id = $1 AND user_id = $2
 		RETURNING id, user_id, title, description, status, priority,
