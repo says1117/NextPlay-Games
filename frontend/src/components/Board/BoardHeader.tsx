@@ -62,7 +62,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
             variant="ghost"
             size="sm"
             onClick={onManageLabels}
-            className="h-9 gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground px-3"
+            className="h-8.5 gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground px-3"
           >
             <Tag className="h-4 w-4" />
             <span className="hidden sm:inline">Labels</span>
@@ -71,7 +71,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
             variant="ghost"
             size="sm"
             onClick={onManageTeam}
-            className="h-9 gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground px-3"
+            className="h-8.5 gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground px-3"
           >
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Team</span>
@@ -80,7 +80,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
           <Button
             onClick={onNewTask}
             size="sm"
-            className="h-9 gap-1.5 text-sm font-semibold px-4"
+            className="h-8.5 gap-1.5 text-sm font-semibold px-4"
           >
             <Plus className="h-4 w-4" />
             New Task
@@ -103,12 +103,12 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
             placeholder="Search tasks…"
             value={filters.search}
             onChange={e => update({ search: e.target.value })}
-            className="pl-8 h-9 text-sm w-full border-border/60 bg-muted/30 focus:bg-background"
+            className="pl-8 h-8.5 text-sm w-full border-border/60 bg-muted/30 focus:bg-background"
           />
         </div>
 
         <Select value={filters.priority} onValueChange={v => v && update({ priority: v as FilterState['priority'] })}>
-          <SelectTrigger className="h-9 w-full sm:w-36 text-sm border-border/60 bg-muted/30">
+          <SelectTrigger className="h-8.5 w-full sm:w-36 text-sm border-border/60 bg-muted/30">
             <SelectValue placeholder="Priority" />
           </SelectTrigger>
           <SelectContent>
@@ -122,7 +122,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
 
         {members.length > 0 && (
           <Select value={filters.assigneeId} onValueChange={v => v && update({ assigneeId: v })}>
-            <SelectTrigger className="h-9 w-full sm:w-40 text-sm border-border/60 bg-muted/30">
+            <SelectTrigger className="h-8.5 w-full sm:w-40 text-sm border-border/60 bg-muted/30">
               <SelectValue placeholder="Assignee" />
             </SelectTrigger>
             <SelectContent>
@@ -156,7 +156,7 @@ export function BoardHeader({ tasks, filters, members, labels, onFiltersChange, 
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="inline-flex items-center gap-1 h-9 px-2.5 rounded text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-1 h-8.5 px-2.5 rounded text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="h-3.5 w-3.5" />
             Clear
